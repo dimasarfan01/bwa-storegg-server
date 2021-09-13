@@ -28,14 +28,17 @@ module.exports = {
         .populate("category")
         .populate("nominals")
         .populate("user", "_id name phoneNumber");
-
-      res
-        .status(voucher ? 200 : 404)
-        .json(
-          voucher
-            ? { data: voucher }
-            : { message: "voucher game tidak ditemukan.!" }
-        );
+      const payment = await Payment.find();
+      res.status(voucher ? 200 : 404).json(
+        voucher
+          ? {
+              data: {
+                detail: voucher,
+                payment: payment,
+              },
+            }
+          : { message: "voucher game tidak ditemukan.!" }
+      );
     } catch (err) {
       res.status(500).json({ message: err.message || `Internal server error` });
     }
@@ -56,7 +59,7 @@ module.exports = {
       const { accountUser, name, nominal, voucher, payment, bank } = req.body;
 
       const res_voucher = await Voucher.findOne({ _id: voucher })
-        .select("name caegory _id thumbnail user")
+        .select("name category _id thumbnail user")
         .populate("category")
         .populate("user");
 
