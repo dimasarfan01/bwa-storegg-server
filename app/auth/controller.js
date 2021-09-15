@@ -71,11 +71,19 @@ module.exports = {
   //   }
   // },
   signup: async (req, res, next) => {
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    }
     try {
       const payload = req.body;
-
-      let player = new Player(payload);
-
+      let toBase64;
+      let player = new Player({ ...payload, avatar: toBase64 });
+      getBase64(toBase64);
       await player.save();
 
       delete player._doc.password;
