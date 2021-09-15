@@ -6,89 +6,59 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
-  // signup: async (req, res, next) => {
-  //   try {
-  //     const payload = req.body;
-
-  //     if (req.file) {
-  //       let tmp_path = req.file.path;
-  //       let originaExt =
-  //         req.file.originalname.split(".")[
-  //           req.file.originalname.split(".").length - 1
-  //         ];
-  //       let filename = req.file.filename + "." + originaExt;
-  //       let target_path = path.resolve(
-  //         config.rootPath,
-  //         `public/uploads/${filename}`
-  //       );
-
-  //       const src = fs.createReadStream(tmp_path);
-  //       const dest = fs.createWriteStream(target_path);
-
-  //       src.pipe(dest);
-
-  //       src.on("end", async () => {
-  //         try {
-  //           const player = new Player({
-  //             ...payload,
-  //             avatar: filename,
-  //           });
-
-  //           await player.save();
-
-  //           delete player._doc.password;
-
-  //           res.status(201).json({ data: player });
-  //         } catch (err) {
-  //           if (err && err.name === "ValidationError") {
-  //             return res.status(422).json({
-  //               error: 1,
-  //               message: err.message,
-  //               fields: err.errors,
-  //             });
-  //           }
-  //           next(err);
-  //         }
-  //       });
-  //     } else {
-  //       let player = new Player(payload);
-
-  //       await player.save();
-
-  //       delete player._doc.password;
-
-  //       res.status(201).json({ data: player });
-  //     }
-  //   } catch (err) {
-  //     if (err && err.name === "ValidationError") {
-  //       return res.status(422).json({
-  //         error: 1,
-  //         message: err.message,
-  //         fields: err.errors,
-  //       });
-  //     }
-  //     next(err);
-  //   }
-  // },
   signup: async (req, res, next) => {
-    function getBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-      });
-    }
     try {
       const payload = req.body;
-      let toBase64;
-      let player = new Player({ ...payload, avatar: toBase64 });
-      getBase64(toBase64);
-      await player.save();
 
-      delete player._doc.password;
+      if (req.file) {
+        let tmp_path = req.file.path;
+        let originaExt =
+          req.file.originalname.split(".")[
+            req.file.originalname.split(".").length - 1
+          ];
+        let filename = req.file.filename + "." + originaExt;
+        let target_path = path.resolve(
+          config.rootPath,
+          `public/uploads/${filename}`
+        );
 
-      res.status(201).json({ data: player });
+        const src = fs.createReadStream(tmp_path);
+        const dest = fs.createWriteStream(target_path);
+
+        src.pipe(dest);
+
+        src.on("end", async () => {
+          try {
+            const player = new Player({
+              ...payload,
+              avatar: filename,
+            });
+
+            await player.save();
+
+            delete player._doc.password;
+
+            res.status(201).json({ data: player });
+          } catch (err) {
+            if (err && err.name === "ValidationError") {
+              return res.status(422).json({
+                error: 1,
+                message: err.message,
+                fields: err.errors,
+              });
+            }
+            next(err);
+          }
+        });
+      } else {
+        let player = new Player(payload);
+
+        await player.save();
+
+        delete player._doc.password;
+
+        res.status(201).json({ data: player });
+      }
     } catch (err) {
       if (err && err.name === "ValidationError") {
         return res.status(422).json({
@@ -100,6 +70,7 @@ module.exports = {
       next(err);
     }
   },
+
   signin: (req, res, next) => {
     const { email, password } = req.body;
 
