@@ -6,59 +6,81 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
+  // signup: async (req, res, next) => {
+  //   try {
+  //     const payload = req.body;
+
+  //     if (req.file) {
+  //       let tmp_path = req.file.path;
+  //       let originaExt =
+  //         req.file.originalname.split(".")[
+  //           req.file.originalname.split(".").length - 1
+  //         ];
+  //       let filename = req.file.filename + "." + originaExt;
+  //       let target_path = path.resolve(
+  //         config.rootPath,
+  //         `public/uploads/${filename}`
+  //       );
+
+  //       const src = fs.createReadStream(tmp_path);
+  //       const dest = fs.createWriteStream(target_path);
+
+  //       src.pipe(dest);
+
+  //       src.on("end", async () => {
+  //         try {
+  //           const player = new Player({
+  //             ...payload,
+  //             avatar: filename,
+  //           });
+
+  //           await player.save();
+
+  //           delete player._doc.password;
+
+  //           res.status(201).json({ data: player });
+  //         } catch (err) {
+  //           if (err && err.name === "ValidationError") {
+  //             return res.status(422).json({
+  //               error: 1,
+  //               message: err.message,
+  //               fields: err.errors,
+  //             });
+  //           }
+  //           next(err);
+  //         }
+  //       });
+  //     } else {
+  //       let player = new Player(payload);
+
+  //       await player.save();
+
+  //       delete player._doc.password;
+
+  //       res.status(201).json({ data: player });
+  //     }
+  //   } catch (err) {
+  //     if (err && err.name === "ValidationError") {
+  //       return res.status(422).json({
+  //         error: 1,
+  //         message: err.message,
+  //         fields: err.errors,
+  //       });
+  //     }
+  //     next(err);
+  //   }
+  // },
   signup: async (req, res, next) => {
     try {
       const payload = req.body;
 
-      if (req.file) {
-        let tmp_path = req.file.path;
-        let originaExt =
-          req.file.originalname.split(".")[
-            req.file.originalname.split(".").length - 1
-          ];
-        let filename = req.file.filename + "." + originaExt;
-        let target_path = path.resolve(
-          config.rootPath,
-          `public/uploads/${filename}`
-        );
+      let player = new Player(payload);
 
-        const src = fs.createReadStream(tmp_path);
-        const dest = fs.createWriteStream(target_path);
+      await player.save();
 
-        src.pipe(dest);
+      delete player._doc.password;
 
-        src.on("end", async () => {
-          try {
-            const player = new Player({
-              ...payload,
-              avatar: filename,
-            });
-
-            await player.save();
-
-            delete player._doc.password;
-
-            res.status(201).json({ data: player });
-          } catch (err) {
-            if (err && err.name === "ValidationError") {
-              return res.status(422).json({
-                error: 1,
-                message: err.message,
-                fields: err.errors,
-              });
-            }
-            next(err);
-          }
-        });
-      } else {
-        let player = new Player(payload);
-
-        await player.save();
-
-        delete player._doc.password;
-
-        res.status(201).json({ data: player });
-      }
+      res.status(201).json({ data: player });
     } catch (err) {
       if (err && err.name === "ValidationError") {
         return res.status(422).json({
@@ -70,7 +92,6 @@ module.exports = {
       next(err);
     }
   },
-
   signin: (req, res, next) => {
     const { email, password } = req.body;
 
