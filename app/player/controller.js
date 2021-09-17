@@ -222,7 +222,9 @@ module.exports = {
 
   profile: async (req, res) => {
     try {
-      const findPlayer = await Player.findOne({ id: req.player._id });
+      const { id } = req.params;
+      const findPlayer = await Player.findOne({ _id: id });
+
       delete findPlayer._doc.password;
       res.status(200).json({ data: findPlayer });
     } catch (err) {
@@ -232,7 +234,9 @@ module.exports = {
 
   getProfileImg: async (req, res) => {
     try {
-      const findImg = await Player.findOne({ id: req.player._id });
+      const { id } = req.params;
+
+      const findImg = await Player.findOne({ _id: id });
       res.status(200).json({ data: { avatar: findImg.avatar } });
     } catch (err) {
       res.status(500).json({ message: err.message || `Internal server error` });

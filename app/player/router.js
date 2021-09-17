@@ -26,8 +26,8 @@ router.post("/checkout", isLoginPlayer, checkout);
 router.get("/history", isLoginPlayer, history);
 router.get("/history/:id/detail", isLoginPlayer, historyDetail);
 router.get("/dashboard", isLoginPlayer, dashboard);
-router.get("/profile", isLoginPlayer, profile);
-router.get("/profile/img", isLoginPlayer, getProfileImg);
+router.get("/profile/:id", isLoginPlayer, profile);
+router.get("/profileimg/:id", isLoginPlayer, getProfileImg);
 router.put("/profile", isLoginPlayer, upload.none(), editProfile);
 
 module.exports = router;
