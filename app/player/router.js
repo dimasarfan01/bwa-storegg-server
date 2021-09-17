@@ -10,9 +10,13 @@ const {
   checkout,
   history,
   historyDetail,
+  getProfileImg,
 } = require("./controller");
 const { isLoginPlayer } = require("../middleware/auth");
 const multer = require("multer");
+const upload = multer({
+  limits: { fieldSize: 25 * 1024 * 1024 },
+});
 const os = require("os");
 
 router.get("/landingpage", landingPage);
@@ -23,11 +27,7 @@ router.get("/history", isLoginPlayer, history);
 router.get("/history/:id/detail", isLoginPlayer, historyDetail);
 router.get("/dashboard", isLoginPlayer, dashboard);
 router.get("/profile", isLoginPlayer, profile);
-router.put(
-  "/profile",
-  isLoginPlayer,
-  multer({ dest: os.tmpdir() }).single("image"),
-  editProfile
-);
+router.get("/profile/img", isLoginPlayer, getProfileImg);
+router.put("/profile", isLoginPlayer, upload.none(), editProfile);
 
 module.exports = router;
